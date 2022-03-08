@@ -7,6 +7,10 @@ const TransactionSchema = new Schema({
         type: mongoose.Types.ObjectId,
         required: true
     },
+    coin: {
+        type: String,
+        required: true
+    },
     wallet: {
         type: String,
         required: true
@@ -28,6 +32,9 @@ const TransactionSchema = new Schema({
         default: 'Pending'
     },
     txnId: {
+        type: String,
+    },
+    txnRef: {
         type: String,
     },
     date: {

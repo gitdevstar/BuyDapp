@@ -14,11 +14,14 @@
     "node": ">=8.10"
   },
   "dependencies": {
+    "api": "^4.2.0",
+    "coinbase-pro-node": "^4.0.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "cross-env": "^7.0.0",
     "dotenv": "^6.2.0",
     "express": "^4.16.4",
+    "flutterwave-node-v3": "^1.0.9",
     "fs": "0.0.1-security",
     "is-empty": "^1.2.0",
     "moment": "^2.22.2",
