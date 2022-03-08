@@ -1,15 +1,14 @@
+require('dotenv').config();
 const Transaction = require("../models/Transaction");
 
 const Flutterwave = require('flutterwave-node-v3');
-const flw = new Flutterwave(PUBLIC_KEY, SECRET_KEY);
+const flw = new Flutterwave(process.env.FLUTTERWAVE_PUBLIC_KEY, process.env.FLUTTERWAVE_SECRET_KEY);
 
 import {CoinbasePro} from 'coinbase-pro-node';
 const auth = {
-    apiKey: '',
-    apiSecret: '',
-    passphrase: '',
-    // The Sandbox is for testing only and offers a subset of the products/assets:
-    // https://docs.pro.coinbase.com/#sandbox
+    apiKey: process.env.COINBASE_API_KEY,
+    apiSecret: process.env.COINBASE_SECRET_KEY,
+    passphrase: process.env.COINBASE_PHRASE,
     useSandbox: true,
 };
 const client = new CoinbasePro(auth);
