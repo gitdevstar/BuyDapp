@@ -50,7 +50,6 @@ class Controller {
                 "redirect_url":"http://localhost:8001/api/webhook",
                 "enckey": process.env.FLUTTERWAVE_ENCRYPTION_KEY,
              };
-            console.log('charge detail', details);
         } else {
             details = {
                 "currency":"USD",
