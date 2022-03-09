@@ -138,7 +138,9 @@ class App extends React.Component {
 
         Api.apiFetch('/checkout', requestOptions)
         .then(data => {
-            alert('sent');
+            if (data['status'])
+                alert('sent');
+            else console.log('result issue', data['result']);
         })
         .catch(error => {
             console.log(error);
