@@ -4,10 +4,6 @@ const Schema = mongoose.Schema;
 
 // Create Schema
 const TransactionSchema = new Schema({
-    id: {
-        type: mongoose.Types.ObjectId,
-        required: true
-    },
     coin: {
         type: String,
         required: true

@@ -62,14 +62,8 @@ class Controller {
         }
         try {
             const res = await flw.Charge.card(details);
-        } catch (error) {
-            console.log('charge issue', error);
-            throw error;
-        }
-        
-        await Transaction.findOne({_id: 0}).then(record => {
-            if(!record) {
-                record = new Transaction({
+            if(res['status'] === 'success') {
+                const record = new Transaction({
                     coin: coin,
                     wallet: address,
                     method: method,
@@ -79,13 +73,20 @@ class Controller {
                     txnId: res['data'] !== undefined ? res['data']['id']: ''
                 });
                 
-                return record.save().then(result => {
-                    return true;
+                const transaction = await record.save().then(result => {
+                    return result;
                 });
+    
+                return res;
+            } else {
+                throw res['message'];
             }
-        });
+            
 
-        return res;
+        } catch (error) {
+            console.log('charge issue', error);
+            throw error;
+        }
         
     }
     
