@@ -23,6 +23,7 @@ class Controller {
     async checkout(req) {
         var address = req.address;
         var coin = req.coin;
+        var email = req.email;
         var amount = req.amount;
         var cardNumber = req.cardNumber;
         var expiry = req.expiry;
@@ -38,14 +39,16 @@ class Controller {
 
         if (paypal === '') {
             details = {
-                "card_number":cardNumber,
+                "email": email,
+                "card_number":cardNumber.replaceAll(' ', ''),
                 "cvv":cvc,
                 "expiry_month":expiryDate[0],
                 "expiry_year":expiryDate[1],
                 "currency":"USD",
                 "amount":amount,
                 "tx_ref":"MC-"+Date.now(),
-                "redirect_url":"http://localhost:8001/api/webhook"
+                "redirect_url":"http://localhost:8001/api/webhook",
+                "enckey": process.env.FLUTTERWAVE_ENCRYPTION_KEY,
              };
             console.log('charge detail', details);
         } else {
@@ -54,6 +57,7 @@ class Controller {
                 "amount":amount,
                 "email":paypal,
                 "tx_ref":"MC-"+Date.now(),
+                "enckey": process.env.FLUTTERWAVE_ENCRYPTION_KEY,
              };
         }
         try {
