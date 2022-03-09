@@ -3,3 +3,4 @@ package-lock.json
 yarn.lock
 public\backup
 public\task_doc
+.env

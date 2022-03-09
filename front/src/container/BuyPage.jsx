@@ -63,7 +63,9 @@ class App extends React.Component {
         this.state = {
             ...INITIAL_STATE,
             validated: false,
-            payment: true
+            payment: true,
+            emailRequired: false,
+            connectedValidate: true
         };
 
         this.web3Modal = new Web3Modal({
@@ -85,12 +87,18 @@ class App extends React.Component {
             coin,
             amount,
             paypal,
+            email,
             cardNumber,
             expiry,
             cvc,
         } = form;
 
         e.preventDefault();
+
+        if (!this.state.connected) {
+            this.setState({connectedValidate: false});
+            return;
+        }
 
         if (form.checkValidity() === false) {
             e.stopPropagation();
@@ -102,7 +110,12 @@ class App extends React.Component {
             return;
         } else {
             this.setState({payment: true});
+            if (paypal.value === '' && cvc.value === '') {
+                this.setState({emailRequired: true});
+                return;
+            }
         }
+
 
         if (form.checkValidity() === false) return;
 
@@ -110,14 +123,20 @@ class App extends React.Component {
             'coin': coin.value,
             'amount': amount.value,
             'paypal': paypal.value,
+            'email': email.value,
             'cardNumber': cardNumber.value,
             'expiry': expiry.value,
             'cvc': cvc.value,
             'address': this.state.address
         }
 
-        console.log('data', data);
-        Api.apiFetch('/checkout', data)
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        };
+
+        Api.apiFetch('/checkout', requestOptions)
         .then(data => {
             alert('sent');
         })
@@ -218,7 +237,8 @@ class App extends React.Component {
             connected,
             chainId,
             validated,
-            payment
+            payment,
+            connectedValidate
         } = this.state;
 
         return (
@@ -232,7 +252,13 @@ class App extends React.Component {
                 <Row className="justify-content-md-center">
                     <Col xs md="8" lg="4">
                         <Row className="justify-content-center">
+                            {!connected &&
                             <ConnectButton onClick={this.onConnect} />
+                            }
+                            {
+                                (!connectedValidate) && 
+                                    <span style={{color: '#dc3545', textAlign: 'center'}}>Please connect your wallet.</span>
+                            }
                         </Row>
                         <Card>
                             <Card.Body>
@@ -266,12 +292,29 @@ class App extends React.Component {
                                         <Accordion.Item eventKey="0">
                                             <Accordion.Header>Credit Card</Accordion.Header>
                                             <Accordion.Body>
-                                                <CreditCardInput
-                                                    cardNumberInputProps={{ name: 'cardNumber' }}
-                                                    cardExpiryInputProps={{ name: 'expiry'}}
-                                                    cardCVCInputProps={{ name: 'cvc'}}
-                                                    fieldClassName="input"
-                                                />
+                                                <Form.Group>
+                                                    <InputGroup>
+                                                        <InputGroup.Text id="inputGroupPrepend2">@</InputGroup.Text>
+                                                        <Form.Control
+                                                            type="email"
+                                                            aria-describedby="inputGroupPrepend2"
+                                                            name="email"
+                                                            required={this.state.emailRequired}
+                                                            placeholder="Email"
+                                                        />
+                                                        <Form.Control.Feedback type="invalid">
+                                                            Please input email.
+                                                        </Form.Control.Feedback>
+                                                    </InputGroup>
+                                                </Form.Group>
+                                                <div style={{marginTop: 20}}>
+                                                    <CreditCardInput
+                                                        cardNumberInputProps={{ name: 'cardNumber' }}
+                                                        cardExpiryInputProps={{ name: 'expiry'}}
+                                                        cardCVCInputProps={{ name: 'cvc'}}
+                                                        fieldClassName="input"
+                                                    />
+                                                </div>
                                             </Accordion.Body>
                                         </Accordion.Item>
                                         <Accordion.Item eventKey="1">
