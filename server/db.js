@@ -4,7 +4,7 @@ const mongoose = require('mongoose'),
 
 var db = mongoose.connection; 
 
-mongoose.connect("mongodb://localhost:27017/ytd", function(err, db) {
+mongoose.connect("mongodb://localhost:27017/buydapp", function(err, db) {
   if(!err) {
     console.log("DB is connected");
   }

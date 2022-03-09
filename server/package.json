@@ -1,7 +1,7 @@
 {
-  "name": "Docketesign",
+  "name": "buydapp-backend",
   "version": "1.0.0",
-  "description": "Docket esign",
+  "description": "It is a backend for buydapp",
   "main": "index.js",
   "scripts": {
     "debug": "node  --inspect-brk index.js",

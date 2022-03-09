@@ -1,19 +1,22 @@
+
+const Flutterwave = require('flutterwave-node-v3');
+
+const sdk = require('api')('@coinbase-exchange/v1.0#10ldz4jl0h5qqgo');
+
 require('dotenv').config();
 const Transaction = require("../models/Transaction");
 
-const Flutterwave = require('flutterwave-node-v3');
 const flw = new Flutterwave(process.env.FLUTTERWAVE_PUBLIC_KEY, process.env.FLUTTERWAVE_SECRET_KEY);
 
-import {CoinbasePro} from 'coinbase-pro-node';
 const auth = {
     apiKey: process.env.COINBASE_API_KEY,
     apiSecret: process.env.COINBASE_SECRET_KEY,
     passphrase: process.env.COINBASE_PHRASE,
     useSandbox: true,
 };
+const {CoinbasePro} = require('coinbase-pro-node');
 const client = new CoinbasePro(auth);
 
-const sdk = require('api')('@coinbase-exchange/v1.0#10ldz4jl0h5qqgo');
 
 class Controller {
     
@@ -33,7 +36,7 @@ class Controller {
 
         var expiryDate = expiry.split(' / ');
 
-        if (paypal !== '') {
+        if (paypal === '') {
             details = {
                 "card_number":cardNumber,
                 "cvv":cvc,
@@ -41,18 +44,24 @@ class Controller {
                 "expiry_year":expiryDate[1],
                 "currency":"USD",
                 "amount":amount,
-                "tx_ref":"MC-3243e",
-                "redirect_url":"https://www,flutterwave.ng"
+                "tx_ref":"MC-"+Date.now(),
+                "redirect_url":"http://localhost:8001/api/webhook"
              };
+            console.log('charge detail', details);
         } else {
             details = {
                 "currency":"USD",
                 "amount":amount,
                 "email":paypal,
-                "tx_ref":"MC-3243e",
+                "tx_ref":"MC-"+Date.now(),
              };
         }
-        const res = await flw.Charge.card(details);
+        try {
+            const res = await flw.Charge.card(details);
+        } catch (error) {
+            console.log('charge issue', error);
+            throw error;
+        }
         
         await Transaction.findOne({_id: 0}).then(record => {
             if(!record) {
@@ -90,7 +99,7 @@ class Controller {
             if (transaction['coin'] === 'eth') {
                 await sdk['ExchangeRESTAPI_GetCoinbasePriceOracle']()
                 .then(res => {
-                    payable = amount / res;
+                    payable = amount / res['prices'['ETH']];
                 })
                 .catch(err => console.error(err));
             } else {
