@@ -13,16 +13,8 @@ router.post("/checkout", (req, res) => {
     });
 });
 
-router.get("/stripe/create/account", (req, res) => {
-    Controller.createAccount(req.body).then(result => {
-        return res.status(200).json({result: result, status: true})
-    }).catch(e => {
-        return res.status(200).json({result: e, status: false})
-    });
-});
-
-router.post("/stripe/account/link", (req, res) => {
-    Controller.accountLink(req.body).then(result => {
+router.post("/stripe/onboard-user", (req, res) => {
+    Controller.onBoradLink(req.body).then(result => {
         return res.status(200).json({result: result, status: true})
     }).catch(e => {
         return res.status(200).json({result: e, status: false})

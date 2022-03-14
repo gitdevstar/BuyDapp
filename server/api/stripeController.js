@@ -1,5 +1,5 @@
 require('dotenv').config();
-const stripe = require('stripe')(process.env.STRIPE_PUB_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SEC_KEY);
 const sdk = require('api')('@coinbase-exchange/v1.0#10ldz4jl0h5qqgo');
 
 class Controller {
@@ -22,24 +22,20 @@ class Controller {
         return client.rest.withdraw.withdrawToCryptoAddress(payable, coin, wallet, 'buy', true);
     }
 
-    async createAccount(req) {
+    async onBoradLink(req) {
         try {
-            const account = await stripe.accounts.create({ type: 'express' });
-            return account;
-        } catch (e) {
-            throw e;
-        }
-    }
-
-    async accountLink(req) {
-        try {
-            const account = req.account;
+            var accountId = req.account;
+            if ( accountId === null || accountId === undefined) {
+                const account = await stripe.accounts.create({ type: 'custom' });
+                accountId = account.id;
+            }
             const accountLink = await stripe.accountLinks.create({
-                account: account,
-                refresh_url: 'https://example.com/reauth',
-                return_url: 'https://example.com/return',
+                account: accountId,
+                refresh_url: 'http://localhost/refresh',
+                return_url: 'http://localhost/return',
                 type: 'account_onboarding',
             });
+            accountLink['id'] = accountId;
             return accountLink;
         } catch (e) {
             throw e;
