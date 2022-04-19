@@ -1,6 +1,5 @@
 require('dotenv').config();
 const stripe = require('stripe')(process.env.STRIPE_SEC_KEY);
-const sdk = require('api')('@coinbase-exchange/v1.0#10ldz4jl0h5qqgo');
 
 class Controller {
 
