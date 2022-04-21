@@ -31,10 +31,18 @@ class Controller {
             const email = req.email;
             const idNumber = req.idNumber;
 
+            dobarr = dob.split('/');
+
+            const dobobj = {
+                day: dobarr[0],
+                month: dobarr[1],
+                year: dobarr[2],
+            }
+
             const individual = {
                 first_name: fName,
                 last_name: lName,
-                dob: dob,
+                dob: dobobj,
                 phone: phone,
                 email: email,
                 id_number: idNumber,
@@ -67,32 +75,15 @@ class Controller {
     async completeAccountWithBank(req) {
         try {
             const accountId = req.accountId;
-            const country = req.country;
-            const city = req.city;
-            const state = req.state; // province
-            const postal_code = req.postal_code;
-            const address = req.address;
+            const country = req.country ?? 'US';
             const account_number = req.bank_account_number;
             const routing_number = req.bank_routing_number;
             const account_holder_name = req.bank_account_holder_name;
 
-            const individualAddress = {
-                city: city, 
-                state: state,
-                country: country,
-                line1: address,
-                postal_code: postal_code,
-            }
-
-            await stripe.accounts.update(
-                accountId,
-                {individual: {address: individualAddress}}
-            );
-
             const bank = {
                 object: 'bank_account',
                 country: country,
-                currency: 'US', // check again,
+                currency: 'USD', // check again,
                 account_holder_name: account_holder_name,
                 routing_number: routing_number,
                 account_number: account_number,
@@ -139,6 +130,42 @@ class Controller {
             throw error;
         }
         
+    }
+
+    async updateAccountDoc(accountId, req) {
+        try {
+            const front = await createDoc(req.doc_front);
+            const back = await createDoc(req.doc_back);
+    
+            const document = {
+                front: front,
+                back: back,
+            }
+    
+            const account = await stripe.accounts.update(
+                accountId,
+                { individual: { verification: {document: document} } }
+            );
+    
+            return account;
+        } catch (error) {
+            throw error;
+        }
+    
+    }
+    
+    async createDoc(path) {
+        var fp = fs.readFileSync(path); // '/path/to/a/file.jpg'
+        var file = await stripe.files.create({
+            purpose: 'identity_document',
+            file: {
+                data: fp,
+                name: 'file.jpg',
+                type: 'application/octet-stream',
+            },
+        });
+    
+        return file.id;
     }
 
     /*** 
